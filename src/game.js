@@ -142,6 +142,7 @@ socket.on('connect', function () {
     socket.on('game:pong', (serverNow) => {
         ping = (Date.now() - lastPingTimestamp) / 2
         clockDiff = (serverNow + ping) - Date.now()
+        console.log({ ping, clockDiff })
     })
 })
 
