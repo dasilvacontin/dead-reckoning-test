@@ -1,29 +1,16 @@
 /* globals requestAnimationFrame, io */
 const kbd = require('@dasilvacontin/keyboard')
-const randomColor = require('randomcolor')
 const deepEqual = require('deep-equal')
 
-document.addEventListener('keydown', function (event) {
-    // event.preventDefault()
-})
-
 const socket = io()
-const myPlayer = {
-  x: 100,
-  y: 100,
-  vx: 0,
-  vy: 0,
-  inputs: {
-    LEFT_ARROW: false,
-    RIGHT_ARROW: false,
-    UP_ARROW: false,
-    DOWN_ARROW: false
-  },
-  color: randomColor()
-}
-let myPlayerId = null
 
-// hash playerId => playerData
+let myPlayerId = null
+const myInputs = {
+  LEFT_ARROW: false,
+  RIGHT_ARROW: false,
+  UP_ARROW: false,
+  DOWN_ARROW: false
+}
 
 const ACCEL = 1 / 500
 
@@ -86,15 +73,19 @@ class GameClient {
 const game = new GameClient()
 
 function updateInputs () {
-  const { inputs } = myPlayer
-  const oldInputs = Object.assign({}, inputs)
+  const oldInputs = Object.assign({}, myInputs)
 
-  for (let key in inputs) {
-    inputs[key] = kbd.isKeyDown(kbd[key])
+  for (let key in myInputs) {
+    myInputs[key] = kbd.isKeyDown(kbd[key])
   }
 
-  if (!deepEqual(myPlayer.inputs, oldInputs)) {
-    socket.emit('move', myPlayer.inputs)
+  if (!deepEqual(myInputs, oldInputs)) {
+    socket.emit('move', myInputs)
+
+    // update our local player' inputs so that we see instant change
+    // (inputs get taken into account in logic simulation)
+    const myPlayer = game.players[myPlayerId]
+    myPlayer.inputs = Object.assign({}, myInputs)
   }
 }
 
