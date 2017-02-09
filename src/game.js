@@ -1,6 +1,7 @@
 /* globals requestAnimationFrame, io */
 const kbd = require('@dasilvacontin/keyboard')
 const deepEqual = require('deep-equal')
+const { ACCEL, COIN_RADIUS, PLAYER_EDGE } = require('./constants.js')
 
 const socket = io()
 
@@ -12,15 +13,15 @@ const myInputs = {
   DOWN_ARROW: false
 }
 
-const ACCEL = 1 / 500
-
 class GameClient {
   constructor () {
     this.players = {}
+    this.coins = {}
   }
 
-  onWorldInit (serverPlayers) {
+  onWorldInit (serverPlayers, serverCoins) {
     this.players = serverPlayers
+    this.coins = serverCoins
   }
 
   onPlayerMoved (player) {
@@ -49,6 +50,12 @@ class GameClient {
       player.y += ACCEL * Math.pow(delta, 2) / 2
       player.vy += ACCEL * delta
     }
+  }
+
+  onCoinCollected (playerId, coinId) {
+    delete this.coins[coinId]
+    const player = this.players[playerId]
+    player.score++
   }
 
   onPlayerDisconnected (playerId) {
@@ -103,13 +110,31 @@ function gameRenderer (game) {
   ctx.fillStyle = 'white'
   ctx.fillRect(0, 0, window.innerWidth, window.innerHeight)
 
+  for (let coinId in game.coins) {
+    const coin = game.coins[coinId]
+    ctx.fillStyle = 'yellow'
+    ctx.beginPath()
+    ctx.arc(coin.x, coin.y, COIN_RADIUS, 0, 2 * Math.PI)
+    ctx.fill()
+  }
+
   for (let playerId in game.players) {
-    const { color, x, y } = game.players[playerId]
+    const { color, x, y, score } = game.players[playerId]
+    ctx.save()
+    ctx.translate(x, y)
     ctx.fillStyle = color
-    ctx.fillRect(x, y, 50, 50)
+    const HALF_EDGE = PLAYER_EDGE / 2
+    ctx.fillRect(-HALF_EDGE, -HALF_EDGE, PLAYER_EDGE, PLAYER_EDGE)
+    // ctx.fillRect(x - HALF_EDGE, y - HALF_EDGE, PLAYER_EDGE, PLAYER_EDGE)
     if (playerId === myPlayerId) {
-      ctx.strokeRect(x, y, 50, 50)
+      ctx.strokeRect(-HALF_EDGE, -HALF_EDGE, PLAYER_EDGE, PLAYER_EDGE)
     }
+
+    ctx.fillStyle = 'white'
+    ctx.textAlign = 'center'
+    ctx.font = '20px Arial'
+    ctx.fillText(score, 0, 7)
+    ctx.restore()
   }
 }
 
@@ -137,12 +162,13 @@ function startPingHandshake () {
 setInterval(startPingHandshake, 250)
 
 socket.on('connect', function () {
-  socket.on('world:init', function (serverPlayers, myId) {
-    game.onWorldInit(serverPlayers)
+  socket.on('world:init', function (serverPlayers, serverCoins, myId) {
+    game.onWorldInit(serverPlayers, serverCoins)
     myPlayerId = myId
   })
   socket.on('playerMoved', game.onPlayerMoved.bind(game))
   socket.on('playerDisconnected', game.onPlayerDisconnected.bind(game))
+  socket.on('coinCollected', game.onCoinCollected.bind(game))
 
   socket.on('game:pong', (serverNow) => {
     ping = (Date.now() - lastPingTimestamp) / 2
