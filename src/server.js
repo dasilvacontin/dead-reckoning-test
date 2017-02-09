@@ -25,6 +25,7 @@ class GameServer {
     this.players = {}
     this.coins = {}
     this.nextCoinId = 0
+    this.lastCoinSpawn = Date.now()
 
     for (let i = 0; i < 10; ++i) {
       const coin = {
@@ -100,6 +101,17 @@ class GameServer {
           player.score++
           io.sockets.emit('coinCollected', player.id, coinId)
         }
+      }
+
+      if (Date.now() - this.lastCoinSpawn > 1000) {
+        const coin = {
+          id: this.nextCoinId++,
+          x: Math.random() * 500,
+          y: Math.random() * 500
+        }
+        this.coins[coin.id] = coin
+        this.lastCoinSpawn = Date.now()
+        io.sockets.emit('coinSpawned', coin)
       }
     }
   }

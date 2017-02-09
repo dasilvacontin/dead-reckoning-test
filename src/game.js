@@ -52,6 +52,10 @@ class GameClient {
     }
   }
 
+  onCoinSpawned (coin) {
+    this.coins[coin.id] = coin
+  }
+
   onCoinCollected (playerId, coinId) {
     delete this.coins[coinId]
     const player = this.players[playerId]
@@ -168,6 +172,7 @@ socket.on('connect', function () {
   })
   socket.on('playerMoved', game.onPlayerMoved.bind(game))
   socket.on('playerDisconnected', game.onPlayerDisconnected.bind(game))
+  socket.on('coinSpawned', game.onCoinSpawned.bind(game))
   socket.on('coinCollected', game.onCoinCollected.bind(game))
 
   socket.on('game:pong', (serverNow) => {
