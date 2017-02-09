@@ -82,10 +82,13 @@ function updateInputs () {
   if (!deepEqual(myInputs, oldInputs)) {
     socket.emit('move', myInputs)
 
-    // update our local player' inputs so that we see instant change
-    // (inputs get taken into account in logic simulation)
-    const myPlayer = game.players[myPlayerId]
-    myPlayer.inputs = Object.assign({}, myInputs)
+    // update our local player' inputs aproximately when the server
+    // takes them into account
+    const frozenInputs = Object.assign({}, myInputs)
+    setTimeout(function () {
+      const myPlayer = game.players[myPlayerId]
+      myPlayer.inputs = frozenInputs
+    }, ping)
   }
 }
 
