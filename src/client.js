@@ -114,6 +114,7 @@ function gameRenderer (game) {
   ctx.fillStyle = 'white'
   ctx.fillRect(0, 0, window.innerWidth, window.innerHeight)
 
+  // render coins
   for (let coinId in game.coins) {
     const coin = game.coins[coinId]
     ctx.fillStyle = 'yellow'
@@ -122,6 +123,7 @@ function gameRenderer (game) {
     ctx.fill()
   }
 
+  // render players
   for (let playerId in game.players) {
     const { color, x, y, score } = game.players[playerId]
     ctx.save()
@@ -129,7 +131,6 @@ function gameRenderer (game) {
     ctx.fillStyle = color
     const HALF_EDGE = PLAYER_EDGE / 2
     ctx.fillRect(-HALF_EDGE, -HALF_EDGE, PLAYER_EDGE, PLAYER_EDGE)
-    // ctx.fillRect(x - HALF_EDGE, y - HALF_EDGE, PLAYER_EDGE, PLAYER_EDGE)
     if (playerId === myPlayerId) {
       ctx.strokeRect(-HALF_EDGE, -HALF_EDGE, PLAYER_EDGE, PLAYER_EDGE)
     }
@@ -140,6 +141,13 @@ function gameRenderer (game) {
     ctx.fillText(score, 0, 7)
     ctx.restore()
   }
+
+  // render `ping` and `clockDiff`
+  ctx.fillStyle = 'black'
+  ctx.textAlign = 'left'
+  ctx.font = '20px Arial'
+  ctx.fillText(`ping: ${ping}`, 15, 30)
+  ctx.fillText(`clockDiff: ${clockDiff}`, 15, 60)
 }
 
 let lastLogic = Date.now()
