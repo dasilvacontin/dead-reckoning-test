@@ -166,6 +166,7 @@ function startPingHandshake () {
 setInterval(startPingHandshake, 250)
 
 socket.on('connect', function () {
+  socket.emit('joinGame', window.location.pathname)
   socket.on('world:init', function (serverPlayers, serverCoins, myId) {
     game.onWorldInit(serverPlayers, serverCoins)
     myPlayerId = myId
