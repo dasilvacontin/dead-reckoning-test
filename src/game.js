@@ -28,7 +28,7 @@ class GameClient {
     console.log(player)
     this.players[player.id] = player
 
-    const delta = (Date.now() + clockDiff) - player.timestamp
+    const delta = (lastLogic + clockDiff) - player.timestamp
 
         // increment position due to current velocity
         // and update our velocity accordingly
@@ -142,13 +142,13 @@ function gameRenderer (game) {
   }
 }
 
-let past = Date.now()
+let lastLogic = Date.now()
 function gameloop () {
   requestAnimationFrame(gameloop)
 
   const now = Date.now()
-  const delta = now - past
-  past = now
+  const delta = now - lastLogic
+  lastLogic = now
 
   updateInputs()
   game.logic(delta)
