@@ -89,7 +89,7 @@ class GameServer {
     const { x, y, vx, vy, ax, ay } = player
 
     const delta = targetTimestamp - player.timestamp
-    const delta2 = delta ** 2
+    const delta2 = Math.pow(delta, 2)
 
     player.x = x + (vx * delta) + (ax * delta2 / 2)
     player.y = y + (vy * delta) + (ay * delta2 / 2)
