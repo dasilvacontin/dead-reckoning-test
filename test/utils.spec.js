@@ -1,5 +1,5 @@
 const { calculatePlayerAcceleration } = require('../src/common/utils.js')
-const { describe, it, before, beforEach, afterEach, after } = require('mocha')
+const { describe, it, beforeEach } = require('mocha')
 const { ACCEL } = require('../src/common/constants.js')
 const expect = require('unexpected')
 
@@ -8,7 +8,7 @@ describe('utils', function () {
   // beforeEach(() => {})
 
   describe('calculatePlayerAcceleration', () => {
-    let player 
+    let player
 
     beforeEach(function () {
       player = {
