@@ -91,7 +91,7 @@ class GameClient {
     }
 
     if (!deepEqual(myInputs, oldInputs)) {
-      this.socket.emit('move', myInputs)
+      this.socket.emit('playerMove', myInputs)
 
       // update our local player' inputs aproximately when
       // the server takes them into account
